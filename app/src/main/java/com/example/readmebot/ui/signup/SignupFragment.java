@@ -63,7 +63,7 @@ public class SignupFragment extends Fragment {
             binding.tilEmail.setError("Email is required");
             return false;
         }
-        if (TextUtils.isEmpty(password) || password.length() < 6) {
+        if (password.length() < 6) {
             binding.tilPassword.setError("Password must be at least 6 characters");
             return false;
         }
@@ -71,26 +71,23 @@ public class SignupFragment extends Fragment {
     }
 
     private void registerUser(String name, String email, String password) {
-        // We removed progress bars to prevent "eternity loading" issues
         binding.btnDoSignup.setEnabled(false);
 
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(name)
-                                    .build();
-
-                            user.updateProfile(profileUpdates).addOnCompleteListener(profileTask -> {
-                                createFirestoreUser(user, name, email);
-                            });
-                        }
-                    } else {
+                .addOnSuccessListener(authResult -> {
+                    FirebaseUser user = authResult.getUser();
+                    if (user != null) {
+                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                .setDisplayName(name)
+                                .build();
+                        user.updateProfile(profileUpdates);
+                        createFirestoreUser(user, name, email);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (isAdded()) {
                         binding.btnDoSignup.setEnabled(true);
-                        String error = task.getException() != null ? task.getException().getMessage() : "Signup failed";
-                        Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Signup Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -102,6 +99,7 @@ public class SignupFragment extends Fragment {
         userMap.put("email", email);
         userMap.put("coupleId", null);
         userMap.put("mood", "Neutral");
+        userMap.put("pairingCode", null);
 
         db.collection("users").document(user.getUid())
                 .set(userMap)
@@ -112,8 +110,10 @@ public class SignupFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    binding.btnDoSignup.setEnabled(true);
-                    Toast.makeText(getContext(), "Database Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    if (isAdded()) {
+                        binding.btnDoSignup.setEnabled(true);
+                        Toast.makeText(getContext(), "Database Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
