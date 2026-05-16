@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "600083674253",
+    "project_id": "readmebot-fbf11",
+    "storage_bucket": "readmebot-fbf11.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600083674253:android:5e4b90f88f3897f7fedec4",
+        "android_client_info": {
+          "package_name": "com.example.readmebot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "600083674253-rs8evigkfbm8urmr3gprvg2lf49ejg2d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPLKqAqiEKl3bjnDnifYh9yMZGbkNNfT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "600083674253-rs8evigkfbm8urmr3gprvg2lf49ejg2d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

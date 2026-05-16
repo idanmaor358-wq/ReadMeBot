@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">readmebot</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <!-- Landing Screen -->
+    <string name="landing_tagline">Bridging the gap when you can\'t read your partner\'s mind.</string>
+    <string name="login_button">Login</string>
+    <string name="create_account_button">Create Account</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Sign in to continue your journey.</string>
+    <string name="email_hint">Email Address</string>
+    <string name="password_hint">Password</string>
+    <string name="sign_in_button">Sign In</string>
+    <string name="back_description">Back</string>
+
+    <!-- Signup Screen -->
+    <string name="signup_title">Join readmebot</string>
+    <string name="signup_subtitle">Start syncing your lives today.</string>
+    <string name="full_name_hint">Your Name</string>
+    <string name="sign_up_button">Sign Up</string>
+</resources>

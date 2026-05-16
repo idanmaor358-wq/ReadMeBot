@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Premium Neutral Palette -->
+    <color name="primary">#1A1C1E</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="secondary">#5E6267</color>
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#F8F9FA</color>
+    <color name="surface_variant">#E9ECEF</color>
+    
+    <!-- Accent Colors -->
+    <color name="accent_soft_blue">#E7F1FF</color>
+    <color name="accent_soft_rose">#FFF0F3</color>
+    
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="gray_text">#6C757D</color>
+</resources>

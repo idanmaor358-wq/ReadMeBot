@@ -1,0 +1,24 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Dark application theme with Premium Look -->
+    <style name="Theme.Readmebot" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/primary</item>
+        
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/surface_variant</item>
+        
+        <!-- Background and Surface for Soft-Dark -->
+        <item name="android:windowBackground">#121212</item>
+        <item name="colorSurface">#1E1E1E</item>
+        <item name="colorSurfaceVariant">#2C2C2C</item>
+
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">#121212</item>
+        <item name="android:windowLightStatusBar">false</item>
+        
+        <!-- Rounded corners -->
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Readmebot.Large</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Readmebot.Medium</item>
+    </style>
+</resources>
