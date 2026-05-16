@@ -37,20 +37,22 @@ public class HomeFragment extends Fragment {
 
         if (mAuth.getCurrentUser() == null) return;
 
-        // Listen for user data changes
+        // Listen for user data (Name, Mood, Couple status)
         listenToUserData();
 
-        // Profile Click Logic - Navigate to Profile Page
+        // Navigate to Profile when clicking the profile picture wrapper
         binding.ivUserProfile.setOnClickListener(v -> {
             Navigation.findNavController(v).navigate(R.id.navigation_profile);
         });
 
-        // Set Mood Click Logic
+        // Click on "Me" mood card to change mood
         binding.cardMyMood.setOnClickListener(v -> showMoodSelector());
     }
 
     private void listenToUserData() {
         String uid = mAuth.getUid();
+        if (uid == null) return;
+        
         userListener = db.collection("users").document(uid)
                 .addSnapshotListener((snapshot, e) -> {
                     if (e != null || snapshot == null || !snapshot.exists()) return;
@@ -59,12 +61,11 @@ public class HomeFragment extends Fragment {
                     String myName = snapshot.getString("name");
                     String myMood = snapshot.getString("mood");
 
-                    // UI Updates
                     if (isAdded()) {
                         binding.tvGreeting.setText("Hi, " + (myName != null ? myName : "there"));
                         binding.tvMyMoodEmoji.setText(getEmojiForMood(myMood));
 
-                        // If not paired, redirect to Pairing screen
+                        // Redirect to Pairing screen if no partner is connected
                         if (coupleId == null) {
                             Navigation.findNavController(requireView()).navigate(R.id.navigation_pairing);
                         } else {
@@ -82,7 +83,6 @@ public class HomeFragment extends Fragment {
 
                     for (DocumentSnapshot doc : snapshots.getDocuments()) {
                         if (!doc.getId().equals(mAuth.getUid())) {
-                            // This is the partner
                             String partnerMood = doc.getString("mood");
                             if (isAdded()) {
                                 binding.tvPartnerMoodEmoji.setText(getEmojiForMood(partnerMood));
@@ -105,8 +105,11 @@ public class HomeFragment extends Fragment {
     }
 
     private void showMoodSelector() {
+        String uid = mAuth.getUid();
+        if (uid == null) return;
+
         String[] moods = {"Happy", "Sad", "Angry", "Tired", "Busy"};
-        db.collection("users").document(mAuth.getUid()).get().addOnSuccessListener(doc -> {
+        db.collection("users").document(uid).get().addOnSuccessListener(doc -> {
             String current = doc.getString("mood");
             int nextIndex = 0;
             for (int i = 0; i < moods.length; i++) {
@@ -115,7 +118,7 @@ public class HomeFragment extends Fragment {
                     break;
                 }
             }
-            db.collection("users").document(mAuth.getUid()).update("mood", moods[nextIndex]);
+            db.collection("users").document(uid).update("mood", moods[nextIndex]);
         });
     }
 

@@ -33,10 +33,8 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Back button
         binding.btnBack.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
 
-        // Login Logic
         binding.btnDoLogin.setOnClickListener(v -> {
             String email = binding.etEmail.getText().toString().trim();
             String password = binding.etPassword.getText().toString().trim();
@@ -52,25 +50,21 @@ public class LoginFragment extends Fragment {
 
             performLogin(email, password);
         });
-
-        // Optional: Forgot Password logic could be added here
     }
 
     private void performLogin(String email, String password) {
-        binding.progressBar.setVisibility(View.VISIBLE);
+        // Removed progress bar as per user request to fix hanging issues
         binding.btnDoLogin.setEnabled(false);
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (isAdded()) {
-                        binding.progressBar.setVisibility(View.GONE);
-                        binding.btnDoLogin.setEnabled(true);
-
                         if (task.isSuccessful()) {
                             Toast.makeText(getContext(), "Welcome back!", Toast.LENGTH_SHORT).show();
                             Navigation.findNavController(requireView()).navigate(R.id.navigation_home);
                         } else {
-                            Toast.makeText(getContext(), "Login failed: " + task.getException().getMessage(),
+                            binding.btnDoLogin.setEnabled(true);
+                            Toast.makeText(getContext(), "Login failed: " + (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
                                     Toast.LENGTH_LONG).show();
                         }
                     }

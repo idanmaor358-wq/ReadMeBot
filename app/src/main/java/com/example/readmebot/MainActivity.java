@@ -26,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navView = binding.navView;
         
-        // Hide the action bar for a cleaner "Premium" look if desired, 
-        // or keep it for internal screens.
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
@@ -40,9 +38,12 @@ public class MainActivity extends AppCompatActivity {
         
         // Listener to control BottomNavigationView visibility
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.navigation_landing || 
-                destination.getId() == R.id.navigation_login || 
-                destination.getId() == R.id.navigation_signup) {
+            int id = destination.getId();
+            if (id == R.id.navigation_landing || 
+                id == R.id.navigation_login || 
+                id == R.id.navigation_signup ||
+                id == R.id.navigation_pairing ||
+                id == R.id.navigation_profile) {
                 navView.setVisibility(View.GONE);
             } else {
                 navView.setVisibility(View.VISIBLE);

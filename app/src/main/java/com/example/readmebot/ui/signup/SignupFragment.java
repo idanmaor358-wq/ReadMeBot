@@ -55,32 +55,23 @@ public class SignupFragment extends Fragment {
     }
 
     private boolean validateInput(String name, String email, String password) {
-        boolean isValid = true;
         if (TextUtils.isEmpty(name)) {
             binding.tilName.setError("Name is required");
-            isValid = false;
-        } else {
-            binding.tilName.setError(null);
+            return false;
         }
-
         if (TextUtils.isEmpty(email)) {
             binding.tilEmail.setError("Email is required");
-            isValid = false;
-        } else {
-            binding.tilEmail.setError(null);
+            return false;
         }
-
         if (TextUtils.isEmpty(password) || password.length() < 6) {
             binding.tilPassword.setError("Password must be at least 6 characters");
-            isValid = false;
-        } else {
-            binding.tilPassword.setError(null);
+            return false;
         }
-        return isValid;
+        return true;
     }
 
     private void registerUser(String name, String email, String password) {
-        binding.progressBar.setVisibility(View.VISIBLE);
+        // We removed progress bars to prevent "eternity loading" issues
         binding.btnDoSignup.setEnabled(false);
 
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -97,7 +88,9 @@ public class SignupFragment extends Fragment {
                             });
                         }
                     } else {
-                        showError(task.getException() != null ? task.getException().getMessage() : "Registration failed");
+                        binding.btnDoSignup.setEnabled(true);
+                        String error = task.getException() != null ? task.getException().getMessage() : "Signup failed";
+                        Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -114,20 +107,14 @@ public class SignupFragment extends Fragment {
                 .set(userMap)
                 .addOnSuccessListener(aVoid -> {
                     if (isAdded()) {
-                        binding.progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Welcome to MindLink!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Account Created!", Toast.LENGTH_SHORT).show();
                         Navigation.findNavController(requireView()).navigate(R.id.navigation_home);
                     }
                 })
-                .addOnFailureListener(e -> showError(e.getMessage()));
-    }
-
-    private void showError(String message) {
-        if (isAdded()) {
-            binding.progressBar.setVisibility(View.GONE);
-            binding.btnDoSignup.setEnabled(true);
-            Toast.makeText(getContext(), "Error: " + message, Toast.LENGTH_LONG).show();
-        }
+                .addOnFailureListener(e -> {
+                    binding.btnDoSignup.setEnabled(true);
+                    Toast.makeText(getContext(), "Database Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override
