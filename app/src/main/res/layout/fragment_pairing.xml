@@ -6,17 +6,27 @@
     android:background="@color/background"
     android:padding="24dp">
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_sign_out_pairing"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Out"
+        android:textColor="@color/secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/tv_pairing_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="sans-serif-black"
         android:text="Better Together"
         android:textColor="@color/primary"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/btn_sign_out_pairing" />
 
     <TextView
         android:id="@+id/tv_pairing_subtitle"
@@ -153,15 +163,5 @@
                 app:backgroundTint="@color/primary" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
-    <ProgressBar
-        android:id="@+id/pairing_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

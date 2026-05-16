@@ -97,7 +97,7 @@ public class SignupFragment extends Fragment {
                             });
                         }
                     } else {
-                        showError(task.getException().getMessage());
+                        showError(task.getException() != null ? task.getException().getMessage() : "Registration failed");
                     }
                 });
     }

@@ -53,6 +53,9 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_launcher_foreground"
                 android:background="@color/accent_soft_blue" />
+
+
+
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Journey Card: Hero Element -->

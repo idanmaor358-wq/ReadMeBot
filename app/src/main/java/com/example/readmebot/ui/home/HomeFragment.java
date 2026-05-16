@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,13 +37,12 @@ public class HomeFragment extends Fragment {
 
         if (mAuth.getCurrentUser() == null) return;
 
-        // Listen for user data changes (especially coupleId and Mood)
+        // Listen for user data changes
         listenToUserData();
 
-        // Logout Button for Testing
-        binding.btnLogout.setOnClickListener(v -> {
-            mAuth.signOut();
-            Navigation.findNavController(v).navigate(R.id.navigation_landing);
+        // Profile Click Logic - Navigate to Profile Page
+        binding.ivUserProfile.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.navigation_profile);
         });
 
         // Set Mood Click Logic
@@ -62,14 +60,16 @@ public class HomeFragment extends Fragment {
                     String myMood = snapshot.getString("mood");
 
                     // UI Updates
-                    binding.tvGreeting.setText("Hi, " + (myName != null ? myName : "there"));
-                    binding.tvMyMoodEmoji.setText(getEmojiForMood(myMood));
+                    if (isAdded()) {
+                        binding.tvGreeting.setText("Hi, " + (myName != null ? myName : "there"));
+                        binding.tvMyMoodEmoji.setText(getEmojiForMood(myMood));
 
-                    // If not paired, redirect to Pairing screen
-                    if (coupleId == null) {
-                        Navigation.findNavController(requireView()).navigate(R.id.navigation_pairing);
-                    } else {
-                        listenToPartnerData(coupleId);
+                        // If not paired, redirect to Pairing screen
+                        if (coupleId == null) {
+                            Navigation.findNavController(requireView()).navigate(R.id.navigation_pairing);
+                        } else {
+                            listenToPartnerData(coupleId);
+                        }
                     }
                 });
     }
@@ -84,7 +84,9 @@ public class HomeFragment extends Fragment {
                         if (!doc.getId().equals(mAuth.getUid())) {
                             // This is the partner
                             String partnerMood = doc.getString("mood");
-                            binding.tvPartnerMoodEmoji.setText(getEmojiForMood(partnerMood));
+                            if (isAdded()) {
+                                binding.tvPartnerMoodEmoji.setText(getEmojiForMood(partnerMood));
+                            }
                         }
                     }
                 });
@@ -103,7 +105,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void showMoodSelector() {
-        // Simple logic for now: toggle through moods
         String[] moods = {"Happy", "Sad", "Angry", "Tired", "Busy"};
         db.collection("users").document(mAuth.getUid()).get().addOnSuccessListener(doc -> {
             String current = doc.getString("mood");
