@@ -44,6 +44,7 @@ public class HomeFragment extends Fragment {
 
         if (mAuth.getCurrentUser() == null) return;
 
+        // Sync all data in real-time
         listenToUserData();
 
         binding.ivUserProfile.setOnClickListener(v -> {

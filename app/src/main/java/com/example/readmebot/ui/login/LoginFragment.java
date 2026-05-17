@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.readmebot.R;
@@ -53,7 +54,6 @@ public class LoginFragment extends Fragment {
     }
 
     private void performLogin(String email, String password) {
-        // Removed progress bar as per user request to fix hanging issues
         binding.btnDoLogin.setEnabled(false);
 
         mAuth.signInWithEmailAndPassword(email, password)
@@ -61,14 +61,25 @@ public class LoginFragment extends Fragment {
                     if (isAdded()) {
                         if (task.isSuccessful()) {
                             Toast.makeText(getContext(), "Welcome back!", Toast.LENGTH_SHORT).show();
-                            Navigation.findNavController(requireView()).navigate(R.id.navigation_home);
+                            navigateToHome();
                         } else {
                             binding.btnDoLogin.setEnabled(true);
-                            Toast.makeText(getContext(), "Login failed: " + (task.getException() != null ? task.getException().getMessage() : "Unknown error"),
-                                    Toast.LENGTH_LONG).show();
+                            String error = task.getException() != null ? task.getException().getMessage() : "Authentication failed";
+                            Toast.makeText(getContext(), "Login failed: " + error, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
+    }
+
+    private void navigateToHome() {
+        try {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+            navController.navigate(R.id.navigation_home);
+        } catch (Exception e) {
+            if (getView() != null) {
+                Navigation.findNavController(getView()).navigate(R.id.navigation_home);
+            }
+        }
     }
 
     @Override

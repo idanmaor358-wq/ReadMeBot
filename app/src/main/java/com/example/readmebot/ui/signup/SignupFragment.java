@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.readmebot.R;
@@ -77,10 +78,13 @@ public class SignupFragment extends Fragment {
                 .addOnSuccessListener(authResult -> {
                     FirebaseUser user = authResult.getUser();
                     if (user != null) {
+                        // Update display name
                         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                 .setDisplayName(name)
                                 .build();
                         user.updateProfile(profileUpdates);
+                        
+                        // Proceed to Firestore setup
                         createFirestoreUser(user, name, email);
                     }
                 })
@@ -105,16 +109,29 @@ public class SignupFragment extends Fragment {
                 .set(userMap)
                 .addOnSuccessListener(aVoid -> {
                     if (isAdded()) {
-                        Toast.makeText(getContext(), "Account Created!", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(requireView()).navigate(R.id.navigation_home);
+                        Toast.makeText(getContext(), "Welcome to MindLink!", Toast.LENGTH_SHORT).show();
+                        navigateToHome();
                     }
                 })
                 .addOnFailureListener(e -> {
                     if (isAdded()) {
                         binding.btnDoSignup.setEnabled(true);
-                        Toast.makeText(getContext(), "Database Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Firestore Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void navigateToHome() {
+        if (getActivity() != null) {
+            try {
+                // Use the main activity NavController for a seamless jump
+                NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                navController.navigate(R.id.navigation_home);
+            } catch (Exception e) {
+                // Fallback for safety
+                Navigation.findNavController(requireView()).navigate(R.id.navigation_home);
+            }
+        }
     }
 
     @Override

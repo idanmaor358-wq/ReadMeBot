@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.readmebot.R;
@@ -31,6 +32,7 @@ public class PairingFragment extends Fragment {
     private FirebaseFirestore db;
     private String currentUserId;
     private ListenerRegistration userListener;
+    private boolean isNavigating = false;
 
     @Nullable
     @Override
@@ -45,7 +47,7 @@ public class PairingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // REAL-TIME LISTENER: Updates UI instantly when Firestore changes (pairing success or code generation)
+        // REAL-TIME LISTENER: This handles navigation automatically when pairing succeeds (for both partners)
         startUserListener();
 
         binding.btnGenerateCode.setOnClickListener(v -> generateNewCode());
@@ -61,7 +63,7 @@ public class PairingFragment extends Fragment {
 
         binding.btnSignOutPairing.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
-            Navigation.findNavController(v).navigate(R.id.navigation_landing);
+            navigateToLanding();
         });
     }
 
@@ -69,23 +71,20 @@ public class PairingFragment extends Fragment {
         if (currentUserId == null) return;
         userListener = db.collection("users").document(currentUserId)
                 .addSnapshotListener((snapshot, e) -> {
-                    if (e != null || snapshot == null || !snapshot.exists()) return;
+                    if (e != null || snapshot == null || !snapshot.exists() || isNavigating) return;
 
-                    // AUTO-NAVIGATE: If a partner connects to us, coupleId will update in Firestore
+                    // If coupleId is found, it means pairing happened (either we did it or partner did it)
                     String coupleId = snapshot.getString("coupleId");
                     if (coupleId != null && isAdded()) {
-                        Toast.makeText(getContext(), "Partner Connected!", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(requireView()).navigate(R.id.navigation_home);
+                        isNavigating = true;
+                        Toast.makeText(getContext(), "Connected Successfully!", Toast.LENGTH_SHORT).show();
+                        navigateToHome();
                         return;
                     }
 
-                    // Update pairing code UI instantly when it changes in DB
+                    // Update UI with existing code
                     String code = snapshot.getString("pairingCode");
-                    if (code != null) {
-                        binding.tvMyCode.setText(code);
-                    } else {
-                        binding.tvMyCode.setText("----");
-                    }
+                    binding.tvMyCode.setText(code != null ? code : "----");
                 });
     }
 
@@ -100,28 +99,27 @@ public class PairingFragment extends Fragment {
         String finalCode = code.toString();
         binding.btnGenerateCode.setEnabled(false);
 
-        // Update Firestore - our SnapshotListener will catch this and update the text on screen
         db.collection("users").document(currentUserId)
                 .update("pairingCode", finalCode)
                 .addOnCompleteListener(task -> {
-                    if (isAdded()) binding.btnGenerateCode.setEnabled(true);
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getContext(), "New code generated!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "Error: Check Firestore Rules", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) {
+                        binding.btnGenerateCode.setEnabled(true);
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getContext(), "New code ready!", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
 
     private void joinPartnerWithCode(String code) {
+        if (isNavigating) return;
         binding.btnJoinPartner.setEnabled(false);
         
-        // Find the user who has this pairing code
         db.collection("users")
                 .whereEqualTo("pairingCode", code)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!isAdded()) return;
+                    if (!isAdded() || isNavigating) return;
 
                     if (!queryDocumentSnapshots.isEmpty()) {
                         DocumentSnapshot partnerDoc = queryDocumentSnapshots.getDocuments().get(0);
@@ -135,44 +133,55 @@ public class PairingFragment extends Fragment {
                         }
                     } else {
                         binding.btnJoinPartner.setEnabled(true);
-                        Toast.makeText(getContext(), "Invalid Code! Make sure your partner generated a code.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Invalid Code. Ask your partner for their code.", Toast.LENGTH_LONG).show();
                     }
                 })
                 .addOnFailureListener(e -> {
                     if (isAdded()) {
                         binding.btnJoinPartner.setEnabled(true);
-                        Toast.makeText(getContext(), "Search failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     private void createSharedCouple(String partnerId) {
         String coupleId = db.collection("couples").document().getId();
-        
         Map<String, Object> coupleData = new HashMap<>();
         coupleData.put("coupleId", coupleId);
         coupleData.put("partner1", currentUserId);
         coupleData.put("partner2", partnerId);
         coupleData.put("createdAt", FieldValue.serverTimestamp());
 
-        // Batch update: Create couple doc and update BOTH users simultaneously
         WriteBatch batch = db.batch();
         batch.set(db.collection("couples").document(coupleId), coupleData);
         batch.update(db.collection("users").document(currentUserId), "coupleId", coupleId, "pairingCode", null);
         batch.update(db.collection("users").document(partnerId), "coupleId", coupleId, "pairingCode", null);
 
-        batch.commit().addOnSuccessListener(aVoid -> {
-            // Navigation will be handled by the startUserListener() snapshot trigger
-            // but we add a safety check here.
-            if (isAdded()) {
-                Navigation.findNavController(requireView()).navigate(R.id.navigation_home);
-            }
-        }).addOnFailureListener(e -> {
+        batch.commit().addOnFailureListener(e -> {
             if (isAdded()) {
                 binding.btnJoinPartner.setEnabled(true);
                 Toast.makeText(getContext(), "Connection failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+        // Navigation is handled by startUserListener() snapshot trigger automatically!
+    }
+
+    private void navigateToHome() {
+        try {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+            navController.navigate(R.id.navigation_home);
+        } catch (Exception e) {
+            if (isAdded()) Navigation.findNavController(requireView()).navigate(R.id.navigation_home);
+        }
+    }
+
+    private void navigateToLanding() {
+        try {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+            navController.navigate(R.id.navigation_landing);
+        } catch (Exception e) {
+            Navigation.findNavController(requireView()).navigate(R.id.navigation_landing);
+        }
     }
 
     @Override
