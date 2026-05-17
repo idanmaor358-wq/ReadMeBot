@@ -214,7 +214,7 @@
             android:id="@+id/card_ai_suggestion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="200dp"
             android:layout_marginBottom="32dp"
             app:cardCornerRadius="24dp"
             app:cardElevation="4dp"
