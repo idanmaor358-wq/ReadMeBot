@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Premium Neutral Palette -->
-    <color name="primary">#1A1C1E</color>
+    <!-- Cherry Blossom Premium Palette -->
+    <color name="primary">#D81B60</color> <!-- Deep Pink -->
+    <color name="primary_dark">#AD1457</color>
+    <color name="primary_light">#F48FB1</color>
+    
+    <color name="sakura_pink">#FFB7C5</color> <!-- Main Sakura Pink -->
+    <color name="sakura_soft">#FFF0F3</color> <!-- Very Soft Pink Background -->
+    <color name="sakura_white">#FDFBFB</color> <!-- Off White -->
+    
     <color name="on_primary">#FFFFFF</color>
-    <color name="secondary">#5E6267</color>
-    <color name="background">#FFFFFF</color>
-    <color name="surface">#F8F9FA</color>
-    <color name="surface_variant">#E9ECEF</color>
+    <color name="secondary">#880E4F</color> <!-- Muted Darker Pink/Burgundy -->
+    <color name="background">#FDFBFB</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#FFE4E8</color>
     
     <!-- Accent Colors -->
-    <color name="accent_soft_blue">#E7F1FF</color>
-    <color name="accent_soft_rose">#FFF0F3</color>
+    <color name="leaf_green">#81C784</color> <!-- Soft Green for balance -->
+    <color name="accent_gold">#D4AF37</color> <!-- Gold for premium touch -->
     
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="gray_text">#6C757D</color>
+    <color name="black">#212121</color>
+    <color name="white">#FFFFFF</color>
+    <color name="gray_text">#757575</color>
 </resources>

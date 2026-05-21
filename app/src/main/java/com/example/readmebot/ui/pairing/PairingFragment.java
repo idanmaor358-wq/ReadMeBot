@@ -47,7 +47,7 @@ public class PairingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // REAL-TIME LISTENER: This handles navigation automatically when pairing succeeds (for both partners)
+        // REAL-TIME LISTENER: Single source of truth for navigation and code display
         startUserListener();
 
         binding.btnGenerateCode.setOnClickListener(v -> generateNewCode());
@@ -73,7 +73,7 @@ public class PairingFragment extends Fragment {
                 .addSnapshotListener((snapshot, e) -> {
                     if (e != null || snapshot == null || !snapshot.exists() || isNavigating) return;
 
-                    // If coupleId is found, it means pairing happened (either we did it or partner did it)
+                    // AUTO-NAVIGATE: If partner joins us, coupleId updates, and we move to Home instantly
                     String coupleId = snapshot.getString("coupleId");
                     if (coupleId != null && isAdded()) {
                         isNavigating = true;
@@ -82,7 +82,7 @@ public class PairingFragment extends Fragment {
                         return;
                     }
 
-                    // Update UI with existing code
+                    // Update UI with our code
                     String code = snapshot.getString("pairingCode");
                     binding.tvMyCode.setText(code != null ? code : "----");
                 });
@@ -98,15 +98,13 @@ public class PairingFragment extends Fragment {
 
         String finalCode = code.toString();
         binding.btnGenerateCode.setEnabled(false);
+        binding.tvMyCode.setText("Generating...");
 
         db.collection("users").document(currentUserId)
                 .update("pairingCode", finalCode)
                 .addOnCompleteListener(task -> {
                     if (isAdded()) {
                         binding.btnGenerateCode.setEnabled(true);
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), "New code ready!", Toast.LENGTH_SHORT).show();
-                        }
                     }
                 });
     }
@@ -127,13 +125,20 @@ public class PairingFragment extends Fragment {
                         
                         if (partnerId.equals(currentUserId)) {
                             binding.btnJoinPartner.setEnabled(true);
-                            Toast.makeText(getContext(), "You can't pair with your own code!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "You can't pair with yourself!", Toast.LENGTH_SHORT).show();
                         } else {
                             createSharedCouple(partnerId);
                         }
                     } else {
-                        binding.btnJoinPartner.setEnabled(true);
-                        Toast.makeText(getContext(), "Invalid Code. Ask your partner for their code.", Toast.LENGTH_LONG).show();
+                        // Double check if we were already paired by our partner in this exact second
+                        db.collection("users").document(currentUserId).get().addOnSuccessListener(doc -> {
+                            if (doc.exists() && doc.getString("coupleId") != null) {
+                                // Already paired, the snapshot listener will handle navigation.
+                                return;
+                            }
+                            binding.btnJoinPartner.setEnabled(true);
+                            Toast.makeText(getContext(), "Invalid Code. Make sure your partner generated it.", Toast.LENGTH_LONG).show();
+                        });
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -152,6 +157,7 @@ public class PairingFragment extends Fragment {
         coupleData.put("partner2", partnerId);
         coupleData.put("createdAt", FieldValue.serverTimestamp());
 
+        // Batch update to ensure both users and the couple doc are updated at once
         WriteBatch batch = db.batch();
         batch.set(db.collection("couples").document(coupleId), coupleData);
         batch.update(db.collection("users").document(currentUserId), "coupleId", coupleId, "pairingCode", null);
@@ -163,7 +169,7 @@ public class PairingFragment extends Fragment {
                 Toast.makeText(getContext(), "Connection failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        // Navigation is handled by startUserListener() snapshot trigger automatically!
+        // Success is handled by startUserListener() automatically
     }
 
     private void navigateToHome() {
@@ -180,7 +186,7 @@ public class PairingFragment extends Fragment {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
             navController.navigate(R.id.navigation_landing);
         } catch (Exception e) {
-            Navigation.findNavController(requireView()).navigate(R.id.navigation_landing);
+            if (isAdded()) Navigation.findNavController(requireView()).navigate(R.id.navigation_landing);
         }
     }
 
