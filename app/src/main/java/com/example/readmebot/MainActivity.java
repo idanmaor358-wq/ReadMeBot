@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
                 id == R.id.navigation_login || 
                 id == R.id.navigation_signup ||
                 id == R.id.navigation_pairing ||
-                id == R.id.navigation_profile) {
+                id == R.id.navigation_profile ||
+                id == R.id.navigation_mood_selector) {
                 navView.setVisibility(View.GONE);
             } else {
                 navView.setVisibility(View.VISIBLE);

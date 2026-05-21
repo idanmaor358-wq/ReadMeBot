@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/sakura_soft"
     android:padding="24dp">
 
     <ImageButton
@@ -37,7 +37,7 @@
         app:cardCornerRadius="32dp"
         app:cardElevation="0dp"
         app:strokeWidth="1dp"
-        app:strokeColor="@color/surface_variant"
+        app:strokeColor="@color/sakura_pink"
         app:layout_constraintTop_toBottomOf="@id/tv_profile_title">
 
         <LinearLayout
@@ -48,16 +48,18 @@
             android:gravity="center">
 
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                app:cardCornerRadius="50dp"
-                app:cardElevation="4dp">
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                app:cardCornerRadius="60dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="4dp"
+                app:strokeColor="@color/sakura_pink">
                 <ImageView
                     android:id="@+id/iv_profile_large"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_launcher_foreground"
-                    android:background="@color/accent_soft_blue" />
+                    android:background="@color/white" />
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -68,7 +70,7 @@
                 android:fontFamily="sans-serif-bold"
                 android:text="User Name"
                 android:textColor="@color/primary"
-                android:textSize="20sp" />
+                android:textSize="22sp" />
 
             <TextView
                 android:id="@+id/tv_profile_email"
@@ -77,7 +79,7 @@
                 android:layout_marginTop="4dp"
                 android:text="user@example.com"
                 android:textColor="@color/secondary"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -90,8 +92,9 @@
         android:layout_marginBottom="32dp"
         android:text="Sign Out"
         android:textAllCaps="false"
-        android:textColor="#E63946"
+        android:textColor="@color/primary"
         app:cornerRadius="32dp"
+        app:backgroundTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

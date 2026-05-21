@@ -44,14 +44,18 @@ public class HomeFragment extends Fragment {
 
         if (mAuth.getCurrentUser() == null) return;
 
-        // Sync all data in real-time
+        // Real-time synchronization
         listenToUserData();
 
+        // Navigate to Mood Selector when clicking the Me mood card
+        binding.cardMyMood.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.navigation_mood_selector);
+        });
+
+        // Navigate to Profile
         binding.ivUserProfile.setOnClickListener(v -> {
             Navigation.findNavController(v).navigate(R.id.navigation_profile);
         });
-
-        binding.cardMyMood.setOnClickListener(v -> showMoodSelector());
     }
 
     private void listenToUserData() {
@@ -127,32 +131,15 @@ public class HomeFragment extends Fragment {
     }
 
     private String getEmojiForMood(String mood) {
-        if (mood == null) return "😊";
+        if (mood == null) return "🌸";
         switch (mood) {
             case "Happy": return "😊";
             case "Sad": return "😢";
             case "Angry": return "😠";
             case "Tired": return "😴";
             case "Busy": return "⏳";
-            default: return "😊";
+            default: return "🌸";
         }
-    }
-
-    private void showMoodSelector() {
-        String uid = mAuth.getUid();
-        if (uid == null) return;
-        String[] moods = {"Happy", "Sad", "Angry", "Tired", "Busy"};
-        db.collection("users").document(uid).get().addOnSuccessListener(doc -> {
-            String current = doc.getString("mood");
-            int nextIndex = 0;
-            for (int i = 0; i < moods.length; i++) {
-                if (moods[i].equals(current)) {
-                    nextIndex = (i + 1) % moods.length;
-                    break;
-                }
-            }
-            db.collection("users").document(uid).update("mood", moods[nextIndex]);
-        });
     }
 
     @Override

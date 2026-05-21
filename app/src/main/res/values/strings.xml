@@ -22,4 +22,10 @@
     <string name="signup_subtitle">Start syncing your lives today.</string>
     <string name="full_name_hint">Your Name</string>
     <string name="sign_up_button">Sign Up</string>
+    <string name="how_are_you_feeling_today">How are you feeling today?</string>
+    <string name="happy_mood">Happy Mood</string>
+    <string name="sad_mood">Sad Mood</string>
+    <string name="angry_mood">Angry Mood</string>
+    <string name="neutral_mood">Neutral Mood</string>
+    <string name="back">Back</string>
 </resources>

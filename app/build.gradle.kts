@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
+    implementation("androidx.gridlayout:gridlayout:1.1.0")
 
     // Firebase (Using Bill of Materials)
     implementation(platform(libs.firebase.bom))
